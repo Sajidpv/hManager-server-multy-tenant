@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import getCompanyModel from "../models/company.model.js";
 import getCounterModel from "../models/counter.model.js";
 import jsonwebtoken from 'jsonwebtoken';
-import getGodownModel  from "../models/godown.model.js";
+import getGodownModel from "../models/godown.model.js";
 
 
 export async function registerUser(req, res) {
@@ -48,11 +48,11 @@ export async function registerUser(req, res) {
 
                 createUser.setDefaultPermissions(companyId);
 
-                const successRes= await createUser.save();
-                if(successRes){
+                const successRes = await createUser.save();
+                if (successRes) {
                     res.json({ status: true, data: createUser, message: "User Registered Successfully" });
-                }else{
-                    res.json({ status: false,  message: "Error Registering employ" });
+                } else {
+                    res.json({ status: false, message: "Error Registering employ" });
                 }
 
             }
@@ -126,6 +126,68 @@ export async function update(req, res) {
     }
 }
 
+export async function updateOwner(req, res, next) {
+    try {
+        let companyId = req.params.companyId;
+        let userModel = await getUserModel(companyId);
+        const { id, eModel } = req.body;
+
+        const {
+            salary,
+            accDetails,
+            mobile,
+            gender,
+            userType,
+            jobType,
+            name,
+            email,
+            status,
+            password,
+        } = eModel;
+
+        // Construct the update object
+        const updateObj = {
+            $set: {
+                salary,
+                accDetails,
+                mobile,
+                gender,
+                userType,
+                jobType,
+                name,
+                email,
+                status,
+            }
+        };
+
+        // Add password to update object only if it is present
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            const hashpass = await bcrypt.hash(password, salt);
+            updateObj.$set.password = hashpass;
+        }
+
+        const result = await userModel.findOneAndUpdate(
+            { _id: id },
+            updateObj,
+            { new: true } // Return the modified document
+        );
+
+        if (!result) {
+            return res.json({ status: false, message: "Owner not found" });
+        }
+        if (password) {
+            next();
+        } else {
+            res.json({ status: true, message: "Owner updated successfully", data: result });
+
+        }
+
+    } catch (error) {
+        res.json({ message: error.message || "Error updating user", status: false });
+    }
+}
+
 
 
 
@@ -179,7 +241,21 @@ export async function getEmployee(req, res) {
         let companyId = req.user.companyId;
         let userModel = await getUserModel(companyId);
         let godownmode = await getGodownModel(companyId);
-        let data = await userModel.find().populate({ path: 'godownAccess', model: godownmode }).populate({path:'companyId',model:await getCompanyModel()});
+        let data = await userModel.find().populate({ path: 'godownAccess', model: godownmode }).populate({ path: 'companyId', model: await getCompanyModel() });
+        res.status(200).json({ status: true, data: data, message: "Users Loaded" });
+
+    } catch (error) {
+        console.log(error)
+        res.json({ status: false, message: "Failed to fetch users" });
+    }
+}
+
+export async function getOwner(req, res) {
+    try {
+        let companyId = req.params.companyId;
+        let userModel = await getUserModel(companyId);
+        let godownmode = await getGodownModel(companyId);
+        let data = await userModel.find({ userType: 'Owner' }).populate({ path: 'godownAccess', model: godownmode }).populate({ path: 'companyId', model: await getCompanyModel() });
         res.status(200).json({ status: true, data: data, message: "Users Loaded" });
 
     } catch (error) {
@@ -193,8 +269,8 @@ export async function getEmployeeById(req, res) {
         let companyId = req.user.companyId;
         let userModel = await getUserModel(companyId);
         let godownmode = await getGodownModel(companyId);
-        
-        let data = await userModel.findById(req.params.id).populate({ path: 'godownAccess', model: godownmode }).populate({path:'companyId',model:await getCompanyModel()});
+
+        let data = await userModel.findById(req.params.id).populate({ path: 'godownAccess', model: godownmode }).populate({ path: 'companyId', model: await getCompanyModel() });
         if (!data) {
             res.json({ status: false, message: "No user found" });
         } else {

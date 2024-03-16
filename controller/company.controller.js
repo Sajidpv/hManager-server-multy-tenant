@@ -1,6 +1,8 @@
 import { error } from "console";
 import getCompanyModel from "../models/company.model.js";
 import getUserModel from "../models/user.model.js";
+import bcrypt from 'bcrypt';
+
 
 export async function register(req, res, next) {
     try {
@@ -58,9 +60,9 @@ export async function activateCompany(req, res, next) {
                 const item = await userModel.findOne({ email: req.body.email }) || await userModel.findOne({ userType: 'Owner' });
                 if (item) {
                     res.json({ status: true, message: 'Company Status updated' });
-                } else if(!item&&req.body.status==='Active') {
+                } else if (!item && req.body.status === 'Active') {
                     req.user.companyId = companyId;
-                    req.body.status='Active'
+                    req.body.status = 'Active'
                     next();
                 }
             } else {
@@ -75,6 +77,52 @@ export async function activateCompany(req, res, next) {
     }
 
 }
+
+export async function changeCompanyPassword(req, res, next) {
+    try {
+        let companyId = req.params.companyId;
+        let companyModel = await getCompanyModel();
+        const { id, eModel } = req.body;
+
+        const {
+            password,
+        } = eModel;
+
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await companyModel.updateOne(
+            { _id: companyId },
+            { $set: { password: hashedPassword } }
+        );
+
+        if (result.nModified === 0) {
+            return res.status(200).json({ status: false, message: "Password update failed" });
+        }
+
+        res.status(200).json({ status: true, message: "Owner details updated and Password changed successfully." });
+
+
+
+    } catch (error) {
+        res.json({ message: error.message || "Error updating user", status: false });
+    }
+}
+    export async function deleteCompany(req, res,next) {
+        try {
+            let companyId = req.params.companyId;
+            let companyModel = await getCompanyModel();
+            let data;
+
+            data = await companyModel.findByIdAndDelete(companyId);
+        
+                res.status(200).json({ status: true, message: "Database deleted successfully." });
+
+            
+        } catch (error) {
+            res.status(500).json({ status: false, message: error.message });
+        }
+    }
 
 
 

@@ -27,6 +27,20 @@ const getCompanyDb=async(companyId)=>{
     return companydb;
  }
 
+//  const deleteCompanyDb = async (req,res) => {
+//     let companyId=req.params.companyId;
+//     const dbName=`company_${companyId}`;
+
+//     try {
+//           db=db?db:await connect(process.env.BASE_DB_URL);
+//         let dropDb= await db.dropDatabase(dbName);
+//         console.log(dropDb);
+//         res.status(200).json({ status: true, message: "Database deleted successfully." });
+//     } catch (error) {
+//         throw new Error(`Error deleting company database: ${error}`);
+//     }
+// }
+
 export { connect,getCompanyDb };
 
 
