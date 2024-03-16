@@ -18,6 +18,7 @@ import { registerUser, update as __update, getEmployee, updatePassword, getEmplo
 import { registerCutterAssign,getAssignCutter,updateStatusCutterAssign} from "../controller/cutter.assign.controller.js";
 import { registerCutterFinish,getFinishCutter,getFinishCutterAggregate,updateStatusCutterFinish} from "../controller/cutter.finish.controller.js" ;
 import { getCompany } from "../controller/company.controller.js";
+import { getPolicy } from "../controller/policy.controller.js";
 
 import { checkPermission } from "../middleware/authMiddleware.js";
 
@@ -106,6 +107,8 @@ router.get('/get_finisher_assign',checkPermission({ resource: 'assign-finisher',
 router.post('/update_finisher_assign_status/:id',checkPermission({ resource: 'assign-finisher', permission: 'EDIT' }), updateStatus);
 router.post('/add_finisher_finished',checkPermission({ resource: 'finished-products', permission: 'WRITE' }), registerFinishItems);
 router.get('/get_finisher_finished',checkPermission({ resource: 'finished-products', permission: 'READ' }), getFinishedData);
+
+router.get('/policy/get-policy', getPolicy);
 
 
 export default router;

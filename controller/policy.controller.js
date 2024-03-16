@@ -2,7 +2,7 @@ import getPolicyModel from '../models/hmanager.policy.model.js';
 
 export async function policyRegistration(req, res) {
     try {
-        let policyModel = await getPolicyModel(); const { policyName, description, content, } = req.body;
+        let policyModel = await getPolicyModel(); const { policyName, description, content, } = req.body.policyModel;
         const existingPolicy = await policyModel.findOne({ policyName: policyName });      
           if (existingPolicy) {
             res.json({ status: false, message: `${policyName} Already exist` });
@@ -66,7 +66,8 @@ export async function policyUpdate(req, res) {
     try {
         let policyModel = await getPolicyModel();
         let options = { new: true };
-        const { policyName, description, content } = req.body;
+        const { policyName, description, content } = req.body.newModel;
+        console.log(policyName)
 
         const updateObj = {
             $set: {
