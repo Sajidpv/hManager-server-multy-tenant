@@ -1,5 +1,9 @@
 
 import getFinishedModel from "../models/finished.model.js";
+import getFinisherAssignModel from "../models/finisher.assign.model.js";
+import getStockModel from "../models/stock.model.js";
+import getStockItemsModel from "../models/stock_items.model.js";
+import getUserModel from "../models/user.model.js";
 
 export async function registerFinishItems(req, res, next) {
     try {
@@ -13,6 +17,22 @@ export async function registerFinishItems(req, res, next) {
     } catch (error) {
         res.json({ status: false, message:error });
     }
+}
+
+export async function getFinishedItems(req,res){
+  try {
+    let companyId = req.user.companyId;
+    let finishedModel = await getFinishedModel(companyId);
+    const result = await finishedModel.find().populate({path:'finisherAssignID',model:await getFinisherAssignModel(companyId)})
+    .populate({path:'productId',model:await getStockItemsModel(companyId)})
+    .populate({path:'materialId',model:await getStockItemsModel(companyId)})
+    .populate({path:'employId',model:await getUserModel(companyId)});
+
+      res.json({ status: true,data:result, message:'loaded' });
+  } catch (error) {
+
+    res.json({ status: false, message:error });
+  }
 }
 
 

@@ -1,6 +1,9 @@
 
 import getStockModel from "../models/stock.model.js";
+import getStockItemsModel from "../models/stock_items.model.js";
+import getTailerAssignModel from "../models/tailer.assign.model.js";
 import getTailerFinishModel from "../models/tailer.finish.model.js";
+import getUserModel from "../models/user.model.js";
 
 export async function finishTailer(req, res, next) {
   try {
@@ -16,17 +19,22 @@ export async function finishTailer(req, res, next) {
   }
 }
 
-// export async function getFinishedTailer(req,res){
-//   try {
-//     let companyId = req.user.companyId;
-//     let tailerFinishModel = await getTailerFinishModel(companyId);
-//     const result = await tailerFinishModel.find();
+export async function getTailerFinished(req,res){
+  try {
+    let companyId = req.user.companyId;
+    let tailerFinishModel = await getTailerFinishModel(companyId);
+    const result = await tailerFinishModel.find().populate({path:'tailerAssignID',model:await getTailerAssignModel(companyId)})
+    .populate({path:'productId',model:await getStockItemsModel(companyId)})
+    .populate({path:'stockId',model:await getStockModel(companyId), populate: {
+      path: 'itemId',model:await getStockItemsModel(companyId)
+    },})
+    .populate({path:'employId',model:await getUserModel(companyId)});
 
-//       res.json({ status: true,data:result, message:'loaded' });
-//   } catch (error) {
-//     res.json({ status: false, message:error });
-//   }
-// }
+      res.json({ status: true,data:result, message:'loaded' });
+  } catch (error) {
+    res.json({ status: false, message:error });
+  }
+}
 
 
 export async function getFinishedTailer(req, res, next) {
