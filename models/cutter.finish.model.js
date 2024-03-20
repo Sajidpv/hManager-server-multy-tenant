@@ -62,9 +62,13 @@ const cutterFinishSchema = new Schema({
             type: Number,
             required: true,
          },
+         balanceQuantity: {
+            type: Number,
+            required: true,
+         },
          status: {
             type: String,
-            default: 'Pending',
+            default: 'To be assigned',
             require: true
    
          }
@@ -86,23 +90,6 @@ const cutterFinishSchema = new Schema({
    }]},{timestamps:true}); 
 
 
-cutterFinishSchema.pre('save', async function (next) {
-
-   this.updatedOn = new Date();
-   this.createdOn = new Date();
-
-   next();
-
-});
-
-cutterFinishSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
-
-   const update = this.getUpdate();
-   delete update._id;
-   this.updatedOn = new Date();
-
-   next();
-});
 
 
 

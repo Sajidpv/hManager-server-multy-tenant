@@ -3,8 +3,7 @@ import express from "express";
 import { registerColor, update, deleteColor, getColors } from "../controller/color.controller.js";
 import { registerFinishItems,getFinishedItems, getFinishedData } from "../controller/finished.controller.js";
 import { assignFinisher, getAssignFinisher, updateStatus } from "../controller/finisher.assign.controller.js";
-import { finishTailer, getFinishedTailer, updateStatus as _updateStatus, getTailerFinished } from "../controller/tailer.finish.controller.js";
-import { assignTailer, getAssignTailer, updateStatus as __updateStatus } from "../controller/tailer.assign.controller.js";
+import { assignTailer, getAssignTailer, updateTailerDatas } from "../controller/tailer.controller.js";
 import { registerStock, getStock,updateStockQuantity,addStockQuantity } from "../controller/stock.controller.js";
 import { registerStockCategory, updateStockCategory, deleteStockCategory,getStockCategory } from "../controller/stock_category.controller.js";
 import { registerStockItem, getStockItem, updateStockItem, deleteStockItem } from "../controller/stock_items.controller.js";
@@ -94,13 +93,11 @@ router.get('/get_cutter_finish',checkPermission({ resource: 'finish-cutter', per
 router.get('/get_cutter_finish_all',checkPermission({ resource: 'finish-cutter', permission: 'READ' }), getFinishCutterAggregate);
 router.post('/update_cutter_finish_status/:id',checkPermission({ resource: 'finish-cutter', permission: 'EDIT' }),updateStatusCutterFinish);
 
-router.post('/add_tailer_assign',checkPermission({ resource: 'assign-tailer', permission: 'WRITE' }), assignTailer);
+router.post('/add_tailer_assign',checkPermission({ resource: 'assign-tailer', permission: 'WRITE' }), assignTailer,updateStatusCutterFinish);
 router.get('/get_tailer_assign',checkPermission({ resource: 'assign-tailer', permission: 'READ' }), getAssignTailer);
-router.post('/update_tailer_assign_status/:id',checkPermission({ resource: 'assign-tailer', permission: 'EDIT' }), __updateStatus);
-router.post('/add_tailer_finished',checkPermission({ resource: 'finish-tailer', permission: 'WRITE' }), finishTailer);
-router.get('/get_tailer_finish_all',checkPermission({ resource: 'finish-tailer', permission: 'READ' }), getTailerFinished);
-router.get('/get_tailer_finished',checkPermission({ resource: 'finish-tailer', permission: 'READ' }), getFinishedTailer);
-router.post('/update_tailer_finish_status/:id',checkPermission({ resource: 'finish-tailer', permission: 'EDIT' }), _updateStatus);
+router.put('/add_tailer_finished/:id',checkPermission({ resource: 'finish-tailer', permission: 'WRITE' }), updateTailerDatas);
+router.get('/get_tailer_finish_all',checkPermission({ resource: 'finish-tailer', permission: 'READ' }), getAssignTailer);
+router.get('/get_tailer_finished',checkPermission({ resource: 'finish-tailer', permission: 'READ' }), getAssignTailer);
 
 router.post('/add_finisher_assign',checkPermission({ resource: 'assign-finisher', permission: 'WRITE' }), assignFinisher);
 router.get('/get_finisher_assign',checkPermission({ resource: 'assign-finisher', permission: 'READ' }), getAssignFinisher);

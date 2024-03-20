@@ -1,7 +1,7 @@
 
 import getFinisherAssignModel from "../models/finisher.assign.model.js";
 import getStockItemsModel from "../models/stock_items.model.js";
-import getTailerAssignModel from "../models/tailer.assign.model.js";
+import getTailerAssignModel from "../models/tailer.model.js";
 import getTailerFinishModel from "../models/tailer.finish.model.js";
 import getUserModel from "../models/user.model.js";
 

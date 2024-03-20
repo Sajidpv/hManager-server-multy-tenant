@@ -5,7 +5,7 @@ import getUserModel from "./user.model.js";
 import getStockItemsModel from "./stock_items.model.js";
 import getCutterFinishModel from "./cutter.finish.model.js";
 
-const tailerAssgnSchema = new Schema({
+const tailerSchema = new Schema({
     date: {
         type: Date,
         default: Date.now,
@@ -61,29 +61,18 @@ const tailerAssgnSchema = new Schema({
     },
     status: {
         type: String,
-        default: 'Pending',
+        default: 'Processing',
         require: true
 
     }
 }, { timestamps: true });
 
 
-tailerAssgnSchema.pre('save', async function (next) {
-    this.updatedOn = new Date();
-    this.createdOn = new Date();
-    next();
-});
-tailerAssgnSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function (next) {
-    const update = this.getUpdate();
-    delete update._id;
-    this.updatedOn = new Date();
 
-    next();
-});
-const getTailerAssignModel = async (companyId) => {
+const getTailerModel = async (companyId) => {
     const companyDb = await getCompanyDb(companyId);
-    return companyDb.model('assign-tailer', tailerAssgnSchema);
+    return companyDb.model('tailer-docs', tailerSchema);
 }
 
-export default getTailerAssignModel
+export default getTailerModel
 
