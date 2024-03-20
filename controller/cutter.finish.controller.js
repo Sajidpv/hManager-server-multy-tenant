@@ -22,7 +22,6 @@ export async function registerCutterFinish (req, res, next){
           const duplicateColors = newColors.filter(color => existingColors.includes(color));
     
           if (duplicateColors.length > 0) {
-            console.log('Aborting update due to duplicate colors:', duplicateColors);
             return res.status(200).json({ status: false, message: "Color already added" });
           }
  
@@ -30,7 +29,6 @@ export async function registerCutterFinish (req, res, next){
           existingDocument.items.push(...items);
           await existingDocument.save();
         
-          console.log('Document Updated');
           return existingDocument;
         } else {
           const addToFinish = new cutterFinishModel({
@@ -44,7 +42,9 @@ export async function registerCutterFinish (req, res, next){
           });
 
            await addToFinish.save();
-           res.status(200).json({ status: true,data:addToFinish, message: "Finished Succefully" });
+           console.log('finished')
+           next();
+           //res.status(200).json({ status: true,data:addToFinish, message: "Finished Succefully" });
         }        
 
      

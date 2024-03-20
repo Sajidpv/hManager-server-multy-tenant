@@ -93,8 +93,6 @@ export async function registerStock(req, res, next) {
   }
 }
 
-
-
 export async function getStock(req, res) {
   try {
     let companyId = req.user.companyId;
@@ -114,96 +112,110 @@ export async function getStock(req, res) {
   }
 }
 
-
-export async function updateStock(req, res, next) {
+export async function updateStockQuantity(req, res) {
   try {
     let companyId = req.user.companyId;
     let stockModel = await getStockModel(companyId);
-    const { colorId, quantity } = req.body;
-    const itemId = req.params.id;
+    const { stockID, assignedQuantity } = req.body;
+    const item = await stockModel.findById(stockID);
+    if (item) {
+      const id = item._id;
+      let message;
+      for (const assign of assignedQuantity) {
+        const providedGodownId = assign.godownId.toString();
+        const existingGodown = item.godowns.find(g => g.godownId.toString() === providedGodownId);
 
-    const result = await stockModel.updateOne(
-      {
-        _id: itemId,
-        'quantity._id': colorId, // Match the specific colorId in the array
-      },
-      {
-        $inc: { 'quantity.$.quantity': quantity }, // Increment the quantity field
+        if (existingGodown) {
+          const existingColor = existingGodown.colors.find(color => color.color === assign.color);
+
+          if (existingColor) {
+            const existingSize = existingColor.sizes.find(size => size.size === 'default');
+
+            if (existingSize) {
+              try {
+                existingSize.quantity -= assign.quantity;
+                message = 'Stock quantity updated';
+              } catch (error) {
+                message = 'Error updating size quantity';
+              }
+            } else {
+              message = 'Size not found';
+            }
+          } else {
+            message = 'Color not found';
+          }
+        } else {
+          message = 'Godown not found';
+        }
       }
-    );
 
-    if (result.nModified === 0) {
-      return res.json({ status: false, message: 'Color quantity not found in quantities' });
-    }
-
-    const updatedData = await stockModel.findById(itemId);
-
-    const colorItem = updatedData.quantity.find((q) => q._id.toString() === colorId);
-
-    if (!colorItem) {
-      return res.json({ status: false, message: 'Color quantity not found in quantities' });
-    }
-
-    res.json({ status: true, message: 'Quantity updated', data: colorItem });
-  } catch (error) {
-    if (error.code === 11000) {
-      res.json({ message: 'Error occurred', status: false });
+      try {
+        await item.save();
+        const data = await stockModel.findByIdAndUpdate(id, item, { new: true });
+        res.json({ status: true, data: data, message: message });
+      } catch (error) {
+        res.json({ status: false, message: error });
+      }
     } else {
-      res.status(500).json({ message: 'Server error', status: false });
+      res.json({ status: false, message: 'No stock item found' });
     }
+  } catch (error) {
+    console.log(error);
+    res.json({ status: false, message: 'Error Occurred' });
   }
 }
 
-
-
-export async function updateQuantity(req, res, next) {
-  try {
-    const { quantity } = req.body;
-    let companyId = req.user.companyId;
-    let stockModel = await getStockModel(companyId);
-    const item = await stockModel.findById(req.params.id);
-
-    if (item) {
-
-      let id = item._id;
-      let updatedQuantity = item.quantity - req.body.quantity;
-      let updatedData = { quantity: updatedQuantity };
-
-      let options = { new: true };
-
-      const data = await stockModel.findByIdAndUpdate(id, updatedData, options);
-      res.json({ status: true, data: data, message: "Quantity updated" });
-
-    } else {
-      res.status(404).json({ status: false, message: "No item found" });
-    }
-  } catch (error) {
-    res.status(404).json({ status: false, message: error });
-  }
-}
-
-export async function addQuantity(req, res, next) {
+export async function addStockQuantity(req, res) {
   try {
     let companyId = req.user.companyId;
     let stockModel = await getStockModel(companyId);
-    const { quantity } = req.body;
-    const item = await stockModel.findById(req.params.id);
-
+    const    {id,materialId,items } = req.body;
+    const item = await stockModel.findById(materialId);
     if (item) {
-      let id = item._id;
-      let updatedQuantity = item.quantity + req.body.quantity;
-      let updatedData = { quantity: updatedQuantity };
+      const updateid = item._id;
+      let message;
+      const providedGodownId = id.toString();
+        const existingGodown = item.godowns.find(g => g.godownId.toString() === providedGodownId);
 
-      let options = { new: true };
+        if (existingGodown) {
+          const existingColor = existingGodown.colors.find(color => color.color === items[0].color);
 
-      const data = await stockModel.findByIdAndUpdate(id, updatedData, options);
-      res.json({ status: true, data: data, message: "Quantity updated" });
+          if (existingColor) {
+          
+            const existingSize = existingColor.sizes.find(size => size.size === 'default');
 
+            if (existingSize) {
+              try {
+                existingSize.quantity += items[0].balance;
+                message = 'Stock quantity updated';
+              } catch (error) {
+                message = 'Error updating size quantity';
+              }
+            } else {
+              message = 'Size not found';
+            }
+          } else {
+            message = 'Color not found';
+          }
+        } else {
+          message = 'Godown not found';
+        }
+      
+
+      try {
+        await item.save();
+        const data = await stockModel.findByIdAndUpdate(updateid, item, { new: true });
+        console.log(message)
+        res.json({ status: true, data: data, message: message });
+      } catch (error) {
+        res.json({ status: false, message: error });
+      }
     } else {
-      res.status(404).json({ status: false, message: "No item found" });
+      res.json({ status: false, message: 'No stock item found' });
     }
   } catch (error) {
-    res.status(404).json({ status: false, message: error });
+    console.log(error);
+    res.json({ status: false, message: 'Error Occurred' });
   }
 }
 

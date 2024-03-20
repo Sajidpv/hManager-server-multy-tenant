@@ -5,7 +5,7 @@ import { registerFinishItems,getFinishedItems, getFinishedData } from "../contro
 import { assignFinisher, getAssignFinisher, updateStatus } from "../controller/finisher.assign.controller.js";
 import { finishTailer, getFinishedTailer, updateStatus as _updateStatus, getTailerFinished } from "../controller/tailer.finish.controller.js";
 import { assignTailer, getAssignTailer, updateStatus as __updateStatus } from "../controller/tailer.assign.controller.js";
-import { registerStock, getStock, updateStock } from "../controller/stock.controller.js";
+import { registerStock, getStock,updateStockQuantity,addStockQuantity } from "../controller/stock.controller.js";
 import { registerStockCategory, updateStockCategory, deleteStockCategory,getStockCategory } from "../controller/stock_category.controller.js";
 import { registerStockItem, getStockItem, updateStockItem, deleteStockItem } from "../controller/stock_items.controller.js";
 import { registerSizes, getSizes, deleteSizes } from "../controller/size.controller.js";
@@ -70,7 +70,6 @@ router.post('/add_size',checkPermission({ resource: 'sizes', permission: 'WRITE'
 router.get('/get_sizes',checkPermission({ resource: 'sizes', permission: 'READ' }), getSizes);
 router.delete('/delete_sizes/:id',checkPermission({ resource: 'sizes', permission: 'DELETE' }),deleteSizes);
 
-
 router.post('/add_stock_category', checkPermission({ resource: 'stock-categories', permission: 'WRITE' }),registerStockCategory);
 router.put('/update_stock_category',checkPermission({ resource: 'stock-categories', permission: 'EDIT' }), updateStockCategory);
 router.get('/get_stock_category',checkPermission({ resource: 'stock-categories', permission: 'READ' }), getStockCategory);
@@ -85,12 +84,12 @@ router.get('/get_stock_category_item',checkPermission({ resource: 'stock-categor
 router.post('/add_stock',checkPermission({ resource: 'stock', permission: 'WRITE' }),registerStock);
 router.get('/get_stock/:id',checkPermission({ resource: 'stock', permission: 'READ' }), getStock);
 router.get('/get_stock',checkPermission({ resource: 'stock', permission: 'READ' }), getStock);
-router.post('/update_stock/:id',checkPermission({ resource: 'stock', permission: 'EDIT' }), updateStock);
+router.put('/update_stock_quantity',checkPermission({ resource: 'stock', permission: 'EDIT' }), updateStockQuantity);
 
-router.post('/add_cutter_assign',checkPermission({ resource: 'assign-cutter', permission: 'WRITE' }), registerCutterAssign);
+router.post('/add_cutter_assign',checkPermission({ resource: 'assign-cutter', permission: 'WRITE' }), registerCutterAssign,updateStockQuantity);
 router.get('/get_cutter_assign',checkPermission({ resource: 'assign-cutter', permission: 'READ' }),getAssignCutter);
 router.post('/update_cutter_assign_status/:id',checkPermission({ resource: 'assign-cutter', permission: 'EDIT' }), updateStatusCutterAssign);
-router.post('/add_cutter_finish',checkPermission({ resource: 'finish-cutter', permission: 'WRITE' }), registerCutterFinish);
+router.post('/add_cutter_finish',checkPermission({ resource: 'finish-cutter', permission: 'WRITE' }), registerCutterFinish,addStockQuantity);
 router.get('/get_cutter_finish',checkPermission({ resource: 'finish-cutter', permission: 'READ' }), getFinishCutter);
 router.get('/get_cutter_finish_all',checkPermission({ resource: 'finish-cutter', permission: 'READ' }), getFinishCutterAggregate);
 router.post('/update_cutter_finish_status/:id',checkPermission({ resource: 'finish-cutter', permission: 'EDIT' }),updateStatusCutterFinish);

@@ -62,6 +62,12 @@ const cutterFinishSchema = new Schema({
             type: Number,
             required: true,
          },
+         status: {
+            type: String,
+            default: 'Pending',
+            require: true
+   
+         }
       }],
      
       balance: {
@@ -76,12 +82,7 @@ const cutterFinishSchema = new Schema({
          type: Number,
          require: true
       },
-      status: {
-         type: String,
-         default: 'Pending',
-         require: true
-
-      }
+   
    }]},{timestamps:true}); 
 
 
