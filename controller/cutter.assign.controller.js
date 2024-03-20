@@ -76,25 +76,15 @@ export async function updateStatusCutterAssign(req, res, next) {
     let companyId = req.user.companyId;
     let assignCutterModel = await getAssignCutterModel(companyId);
 
-    const { colorId, status: newStatus } = req.body;
-    const itemId = req.params.id;
-
-    const item = await assignCutterModel.findById(itemId);
+    const { items, proAssignID} = req.body;
+    const item = await assignCutterModel.findById(proAssignID);
 
     if (item) {
-      let colorItem = item.assignedQuantity.find((q) => q._id.toString() === colorId);
-
-      if (!colorItem) {
-        colorItem = item.assignedQuantity.find((q) => q.color.toString() === colorId);
-      }
+     let colorItem = item.assignedQuantity.find((q) => q.color.toString() === items[0].color);
       if (colorItem) {
-
-        colorItem.status = newStatus;
-
-
+        colorItem.status = 'Finished';
         await item.save();
-
-        res.json({ status: true, data: item, message: "Status updated" });
+        next();
       } else {
         res.status(404).json({ status: false, message: "Color item not found" });
       }
@@ -102,6 +92,7 @@ export async function updateStatusCutterAssign(req, res, next) {
       res.status(404).json({ status: false, message: "No item found" });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({ status: false, message: error });
   }
 

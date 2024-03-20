@@ -205,7 +205,6 @@ export async function addStockQuantity(req, res) {
       try {
         await item.save();
         const data = await stockModel.findByIdAndUpdate(updateid, item, { new: true });
-        console.log(message)
         res.json({ status: true, data: data, message: message });
       } catch (error) {
         res.json({ status: false, message: error });
@@ -214,7 +213,6 @@ export async function addStockQuantity(req, res) {
       res.json({ status: false, message: 'No stock item found' });
     }
   } catch (error) {
-    console.log(error);
     res.json({ status: false, message: 'Error Occurred' });
   }
 }

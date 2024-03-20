@@ -47,6 +47,18 @@ const tailerAssgnSchema = new Schema({
         type: Number,
         require: true
     },
+    balanceQuantity: {
+        type: Number,
+        require: true
+    },  
+      damageQuantity: {
+        type: Number,
+
+    },  
+      finishedQuantity: {
+        type: Number,
+
+    },
     status: {
         type: String,
         default: 'Pending',
