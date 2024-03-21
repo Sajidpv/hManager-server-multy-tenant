@@ -2,9 +2,9 @@ import express from "express";
 
 import { registerColor, update, deleteColor, getColors } from "../controller/color.controller.js";
 import { registerFinishItems,getFinishedItems, getFinishedData } from "../controller/finished.controller.js";
-import { assignFinisher, getAssignFinisher, updateStatus } from "../controller/finisher.assign.controller.js";
-import { assignTailer, getAssignTailer, updateTailerDatas ,getFinishedTailer} from "../controller/tailer.controller.js";
-import { registerStock, getStock,updateStockQuantity,addStockQuantity } from "../controller/stock.controller.js";
+import { assignFinisher, getAssignFinisher, updateFinisherDatas } from "../controller/finisher.controller.js";
+import { assignTailer, getAssignTailer, updateTailerDatas,updateTailerStatus ,getFinishedTailer} from "../controller/tailer.controller.js";
+import { registerStock, getStock,updateStockQuantity,addStockQuantity ,addFinalProductToStockQuantity} from "../controller/stock.controller.js";
 import { registerStockCategory, updateStockCategory, deleteStockCategory,getStockCategory } from "../controller/stock_category.controller.js";
 import { registerStockItem, getStockItem, updateStockItem, deleteStockItem } from "../controller/stock_items.controller.js";
 import { registerSizes, getSizes, deleteSizes } from "../controller/size.controller.js";
@@ -98,10 +98,9 @@ router.get('/get_tailer_assign',checkPermission({ resource: 'assign-tailer', per
 router.put('/add_tailer_finished/:id',checkPermission({ resource: 'finish-tailer', permission: 'WRITE' }), updateTailerDatas);
 router.get('/get_tailer_finished',checkPermission({ resource: 'finish-tailer', permission: 'READ' }), getFinishedTailer);
 
-router.post('/add_finisher_assign',checkPermission({ resource: 'assign-finisher', permission: 'WRITE' }), assignFinisher);
+router.post('/add_finisher_assign',checkPermission({ resource: 'assign-finisher', permission: 'WRITE' }), assignFinisher,updateTailerStatus);
 router.get('/get_finisher_assign',checkPermission({ resource: 'assign-finisher', permission: 'READ' }), getAssignFinisher);
-router.post('/update_finisher_assign_status/:id',checkPermission({ resource: 'assign-finisher', permission: 'EDIT' }), updateStatus);
-router.post('/add_finisher_finished',checkPermission({ resource: 'finished-products', permission: 'WRITE' }), registerFinishItems);
+router.put('/add_finisher_finished/:id',checkPermission({ resource: 'finished-products', permission: 'WRITE' }), updateFinisherDatas);
 router.get('/get_finisher_finished',checkPermission({ resource: 'finished-products', permission: 'READ' }), getFinishedData);
 router.get('/get_finisher_finished_all',checkPermission({ resource: 'finished-products', permission: 'READ' }), getFinishedItems);
 

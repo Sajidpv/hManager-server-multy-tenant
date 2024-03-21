@@ -217,3 +217,54 @@ export async function addStockQuantity(req, res) {
   }
 }
 
+export async function addFinalProductToStockQuantity(req, res) {
+  try {
+    let companyId = req.user.companyId;
+    let stockModel = await getStockModel(companyId);
+    const    {id,materialId,items } = req.body;
+    const item = await stockModel.findById(materialId);
+    if (item) {
+      const updateid = item._id;
+      let message;
+      const providedGodownId = id.toString();
+        const existingGodown = item.godowns.find(g => g.godownId.toString() === providedGodownId);
+
+        if (existingGodown) {
+          const existingColor = existingGodown.colors.find(color => color.color === items[0].color);
+
+          if (existingColor) {
+          
+            const existingSize = existingColor.sizes.find(size => size.size === 'default');
+
+            if (existingSize) {
+              try {
+                existingSize.quantity += items[0].balance;
+                message = 'Stock quantity updated';
+              } catch (error) {
+                message = 'Error updating size quantity';
+              }
+            } else {
+              message = 'Size not found';
+            }
+          } else {
+            message = 'Color not found';
+          }
+        } else {
+          message = 'Godown not found';
+        }
+      
+
+      try {
+        await item.save();
+        const data = await stockModel.findByIdAndUpdate(updateid, item, { new: true });
+        res.json({ status: true, data: data, message: message });
+      } catch (error) {
+        res.json({ status: false, message: error });
+      }
+    } else {
+      res.json({ status: false, message: 'No stock item found' });
+    }
+  } catch (error) {
+    res.json({ status: false, message: 'Error Occurred' });
+  }
+}

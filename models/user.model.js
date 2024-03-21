@@ -176,8 +176,7 @@ async function getDefaultGodownAccessPermissions(userType, companyId) {
 function getDefaultPermissions(userType) {
    const commonPermissions = { READ: true, WRITE: true, EDIT: true, DELETE: true };
    const customResources = ['user', 'suppliers', 'colors', 'stock', 'sales', 'material-purchase', 'orders', 'stock-categories', 'sizes',
-      'inventory-db', 'godowns', 'tailer-docs', 'sales-estimates', 'assign-finisher',
-      'finished-products', 'finish-cutter', 'assign-cutter', 'company-details'];
+      'inventory-db', 'godowns', 'tailer-docs', 'sales-estimates', 'finisher-docs', 'finish-cutter', 'assign-cutter', 'company-details'];
    switch (userType) {
       case 'Owner':
       case 'Admin':
@@ -193,7 +192,7 @@ function getDefaultPermissions(userType) {
             { resource: 'orders', permissions: { READ: true, WRITE: true, EDIT: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             ...getDefaultCommonPermissions(commonPermissions, [
-               'tailer-docs', 'assign-finisher', 'finished-products',
+               'tailer-docs', 'finisher-docs',
                'finish-cutter', 'assign-cutter'
             ])
          ];
@@ -256,8 +255,7 @@ function getDefaultPermissions(userType) {
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } },
-            { resource: 'assign-finisher', permissions: { READ: true, EDIT: true, } },
-            { resource: 'finished-products', permissions: { READ: true, WRITE: true, } },
+            { resource: 'finisher-docs', permissions: { READ: true, EDIT: true,WRITE: true, } },
             { resource: 'company-details', permissions: { READ: true, } },
          ];
       default:

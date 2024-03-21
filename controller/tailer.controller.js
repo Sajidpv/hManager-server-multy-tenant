@@ -74,6 +74,30 @@ export async function updateTailerDatas(req, res, next) {
     }
 }
 
+export async function updateTailerStatus(req, res, next) {
+    try {
+        let companyId = req.user.companyId;
+        let tailerModel = await getTailerModel(companyId);
+        const {tailerFinishId} = req.body;
+        const result = await tailerModel.updateOne(
+            { _id: tailerFinishId },
+            { $set: { status: 'Assigned' } },
+            { new: true }
+        );
+
+        if (result.nModified === 0) {
+            return res.status(404).json({ status: false, message: "Item not found" });
+        }
+
+        const updatedItem = await tailerModel.findById(tailerFinishId);
+        res.json({ status: true, data: updatedItem, message: "Assigned successfull" });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: false, message: error.message });
+    }
+}
+
 export async function getFinishedTailer(req, res, next) {
     try {
         const companyId = req.user.companyId;

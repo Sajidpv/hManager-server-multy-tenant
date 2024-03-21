@@ -26,6 +26,11 @@ const finisherSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'user',
         require: true
+    }, 
+      tailerFinishId:{
+        type: Schema.Types.ObjectId,
+        ref: 'tailer-docs',
+        require: true
     },
     color: {
         type: String,
@@ -50,11 +55,7 @@ const finisherSchema = new Schema({
         type: Number,
         require: true
     },
-    tailerFinishId:{
-        type: Schema.Types.ObjectId,
-        ref: 'tailer-docs',
-        require: true
-    },
+ 
     status: {
         type: String,
         default:'Processing',
