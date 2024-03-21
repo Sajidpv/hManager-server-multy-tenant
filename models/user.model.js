@@ -176,7 +176,7 @@ async function getDefaultGodownAccessPermissions(userType, companyId) {
 function getDefaultPermissions(userType) {
    const commonPermissions = { READ: true, WRITE: true, EDIT: true, DELETE: true };
    const customResources = ['user', 'suppliers', 'colors', 'stock', 'sales', 'material-purchase', 'orders', 'stock-categories', 'sizes',
-      'inventory-db', 'godowns', 'finish-tailer', 'assign-tailer', 'sales-estimates', 'assign-finisher',
+      'inventory-db', 'godowns', 'tailer-docs', 'sales-estimates', 'assign-finisher',
       'finished-products', 'finish-cutter', 'assign-cutter', 'company-details'];
    switch (userType) {
       case 'Owner':
@@ -193,7 +193,7 @@ function getDefaultPermissions(userType) {
             { resource: 'orders', permissions: { READ: true, WRITE: true, EDIT: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             ...getDefaultCommonPermissions(commonPermissions, [
-               'finish-tailer', 'assign-tailer', 'assign-finisher', 'finished-products',
+               'tailer-docs', 'assign-finisher', 'finished-products',
                'finish-cutter', 'assign-cutter'
             ])
          ];
@@ -245,15 +245,14 @@ function getDefaultPermissions(userType) {
          ]; case 'Tailer':
          return [
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
-            { resource: 'finish-tailer', permissions: { READ: true, WRITE: true, } },
-            { resource: 'assign-tailer', permissions: { READ: true, EDIT: true, } },
+            { resource: 'tailer-docs', permissions: { READ: true, WRITE: true,EDIT: true, } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
             { resource: 'finish-cutter', permissions: { READ: true, } },
             { resource: 'company-details', permissions: { READ: true, } },
          ]; case 'Finisher':
          return [
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
-            { resource: 'finish-tailer', permissions: { READ: true, } },
+            { resource: 'tailer-docs', permissions: { READ: true, } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } },

@@ -47,12 +47,12 @@ export async function updateTailerDatas(req, res, next) {
                 balanceQuantity: balanceQuantity
             },
             $inc: {
-                finishedQuantity: finishedQuantity, 
-                damageQuantity: damageQuantity     
+                finishedQuantity: finishedQuantity,
+                damageQuantity: damageQuantity
             }
         };
         if (balanceQuantity == 0) {
-                updateObj.$set.status ='To be assigned' ;
+            updateObj.$set.status = 'To be assigned';
         }
 
         const result = await tailerModel.updateOne(
@@ -74,3 +74,135 @@ export async function updateTailerDatas(req, res, next) {
     }
 }
 
+export async function getFinishedTailer(req, res, next) {
+    try {
+        const companyId = req.user.companyId;
+        const tailerModel = await getTailerModel(companyId);
+
+        const result = await tailerModel.aggregate([
+            {
+                $match: {
+                    status: 'To be assigned',
+                    finishedQuantity: { $gt: 0 }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'stock-category-items',
+                    localField: 'productId',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            {
+                $unwind: '$product'
+            },
+            {
+                $lookup: {
+                    from: 'stocks',
+                    localField: 'stockId',
+                    foreignField: '_id',
+                    as: 'stock'
+                }
+            },
+            {
+                $unwind: '$stock'
+            },
+            
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'employId',
+                    foreignField: '_id',
+                    as: 'employ'
+                }
+            },
+            {
+                $unwind: '$employ'
+            },
+            {
+                $lookup: {
+                    from: 'finish-cutters',
+                    localField: 'cutterFinishId',
+                    foreignField: '_id',
+                    as: 'cutterFinish'
+                }
+            },
+            {
+                $unwind: '$cutterFinish'
+            },
+            {
+                $group: {
+                    _id: {
+                        productId: '$product',
+                        batchId: '$batchId',
+                        color: '$color',
+                        size: '$size'
+                    },
+                    details: {
+                        $push: {id:'$_id',
+                            stockId: '$stock',
+                            employId: '$employ',
+                            cutterFinishId: '$cutterFinish',
+                            assignedQuantity: '$assignedQuantity',
+                            damageQuantity: '$damageQuantity',
+                            finishedQuantity: '$finishedQuantity',
+                            status: '$status'
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        productId: '$_id.productId',
+                        batchId: '$_id.batchId',
+                        color: '$_id.color'
+                    },
+                    sizes: {
+                        $push: {
+                            size: '$_id.size',
+                            details: '$details'
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        productId: '$_id.productId',
+                        batchId: '$_id.batchId'
+                    },
+                    colors: {
+                        $push: {
+                            color: '$_id.color',
+                            sizes: '$sizes'
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id.productId',
+                    batches: {
+                        $push: {
+                            batchId: '$_id.batchId',
+                            colors: '$colors'
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    batches: 1
+                }
+            }
+        ]);
+        
+        res.json({ status: true, message: 'loaded', data: result });
+
+    } catch (error) {
+        res.json({ status: false, message: error });
+    }
+}

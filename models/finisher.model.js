@@ -2,7 +2,7 @@ import  {Schema } from "mongoose";
 import {getCompanyDb} from "../config/db.js"
 import getStockItemsModel from "./stock_items.model.js";
 
-const finisherAssgnSchema = new Schema({
+const finisherSchema = new Schema({
     date: {
         type: Date,
         default: Date.now,
@@ -17,7 +17,7 @@ const finisherAssgnSchema = new Schema({
         ref:getStockItemsModel,
         require: true
     },
-    materialId: {
+    stockId: {
         type: Schema.Types.ObjectId,
         ref: 'stock',
         require: true
@@ -38,42 +38,34 @@ const finisherAssgnSchema = new Schema({
         type: Number,
         require: true
     },
+    balanceQuantity: {
+        type: Number,
+        require: true
+    },
+    damageQuantity: {
+        type: Number,
+        require: true
+    },
+    finishedQuantity: {
+        type: Number,
+        require: true
+    },
     tailerFinishId:{
         type: Schema.Types.ObjectId,
-        ref: 'finish-tailer',
+        ref: 'tailer-docs',
         require: true
     },
     status: {
         type: String,
-        default:'Pending',
+        default:'Processing',
         require:true
       
     }},{timestamps:true}); 
-
-
-finisherAssgnSchema.pre('save', async function (next) {
-
-    this.updatedOn = new Date();
-    this.createdOn = new Date();
- 
-    next();
- 
- });
- 
- finisherAssgnSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
-    this.updatedOn = new Date();
- 
-    next();
- });
- 
  
 
- const getFinisherAssignModel=async (companyId)=>{
+ const getFinisherModel=async (companyId)=>{
     const companyDb=await getCompanyDb(companyId);
-    return companyDb.model('assign-finisher', finisherAssgnSchema);
+    return companyDb.model('finisher-docs', finisherSchema);
  }
  
- export default getFinisherAssignModel
+ export default getFinisherModel

@@ -1,5 +1,5 @@
 
-import getFinisherAssignModel from "../models/finisher.assign.model.js";
+import getFinisherAssignModel from "../models/finisher.model.js";
 import getStockItemsModel from "../models/stock_items.model.js";
 import getTailerAssignModel from "../models/tailer.model.js";
 import getTailerFinishModel from "../models/tailer.finish.model.js";
@@ -9,9 +9,9 @@ export async function assignFinisher(req, res, next) {
     try {
         let companyId = req.user.companyId;
         let finisherAssignModel = await getFinisherAssignModel(companyId);
-        const    { date,batchId,productId,materialId,employId,color,size,assignedQuantity,tailerFinishId} = req.body;
+        const    { date,batchId,productId,stockId,employId,color,size,assignedQuantity,damageQuantity,finishedQuantity,balanceQuantity,tailerFinishId} = req.body;
     
-        const addToAssign = new finisherAssignModel({ date:date,batchId:batchId,productId:productId,materialId:materialId,employId:employId,color:color,size:size,assignedQuantity:assignedQuantity,tailerFinishId:tailerFinishId});
+        const addToAssign = new finisherAssignModel({ date:date,batchId:batchId,productId:productId,stockId:stockId,employId:employId,color:color,size:size,assignedQuantity:assignedQuantity,damageQuantity:0,finishedQuantity:0,balanceQuantity:assignedQuantity,tailerFinishId:tailerFinishId});
          await addToAssign.save();
         res.json({ status: true,data:addToAssign, message: "Assigned Succefully" });
     } catch (error) {

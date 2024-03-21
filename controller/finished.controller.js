@@ -1,6 +1,6 @@
 
 import getFinishedModel from "../models/finished.model.js";
-import getFinisherAssignModel from "../models/finisher.assign.model.js";
+import getFinisherAssignModel from "../models/finisher.model.js";
 import getStockModel from "../models/stock.model.js";
 import getStockItemsModel from "../models/stock_items.model.js";
 import getUserModel from "../models/user.model.js";
