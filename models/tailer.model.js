@@ -53,11 +53,14 @@ const tailerSchema = new Schema({
     },  
       damageQuantity: {
         type: Number,
-
+        require: true
     },  
       finishedQuantity: {
         type: Number,
-
+        require: true
+    },   toAssignQuantity: {
+        type: Number,
+        require: true
     },
     status: {
         type: String,

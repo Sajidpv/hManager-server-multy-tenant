@@ -75,23 +75,7 @@ const categoryItemSchema = new Schema({
 }, { timestamps: true });
 
 
-categoryItemSchema.pre('save', async function (next) {
 
-   this.updatedOn = new Date();
-   this.createdOn = new Date();
-
-   next();
-
-});
-
-categoryItemSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function (next) {
-
-   const update = this.getUpdate();
-   delete update._id;
-   this.updatedOn = new Date();
-
-   next();
-});
 
 const getStockItemsModel = async (companyId) => {
    const companyDb = await getCompanyDb(companyId);

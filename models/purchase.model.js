@@ -123,27 +123,11 @@ const purchaseSchema = new Schema({
     }},{timestamps:true}); 
 
 
-purchaseSchema.pre('save', async function (next) {
 
-    this.updatedOn = new Date();
-    this.createdOn = new Date();
- 
-    next();
- 
- });
- 
- purchaseSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
-    this.updatedOn = new Date();
- 
-    next();
- });
  
  const getPurchaseModel=async (companyId)=>{
     const companyDb=await getCompanyDb(companyId);
-    return companyDb.model('material-purchase', purchaseSchema);
+    return companyDb.model('purchases', purchaseSchema);
  }
  
  export default getPurchaseModel

@@ -217,54 +217,88 @@ export async function addStockQuantity(req, res) {
   }
 }
 
-export async function addFinalProductToStockQuantity(req, res) {
+export async function addFinalProductToStockQuantity(req, res, next) {
   try {
     let companyId = req.user.companyId;
     let stockModel = await getStockModel(companyId);
-    const    {id,materialId,items } = req.body;
-    const item = await stockModel.findById(materialId);
+    let counterModel = await getCounterModel(companyId);
+    const { categoryId, itemId, godowns } = req.body;
+    const item = await stockModel.findOne({ itemId });
+
     if (item) {
-      const updateid = item._id;
+      const id = item._id;
+      let existingGodown;
+
+      const providedGodownId = godowns[0].godownId.toString();
+      existingGodown = item.godowns.find((g) => g.godownId.toString() === providedGodownId);
+
       let message;
-      const providedGodownId = id.toString();
-        const existingGodown = item.godowns.find(g => g.godownId.toString() === providedGodownId);
+      if (existingGodown) {
+        let existingColor = existingGodown.colors.find((color) => color.color === godowns[0].colors[0].color);
 
-        if (existingGodown) {
-          const existingColor = existingGodown.colors.find(color => color.color === items[0].color);
+        if (existingColor) {
+          const existingSize = existingColor.sizes.find((size) => size.size === godowns[0].colors[0].sizes[0].size);
 
-          if (existingColor) {
-          
-            const existingSize = existingColor.sizes.find(size => size.size === 'default');
-
-            if (existingSize) {
-              try {
-                existingSize.quantity += items[0].balance;
-                message = 'Stock quantity updated';
-              } catch (error) {
-                message = 'Error updating size quantity';
-              }
-            } else {
-              message = 'Size not found';
+          if (existingSize) {
+            try {
+              existingSize.quantity += godowns[0].colors[0].sizes[0].quantity;
+              message = 'New quantity updated';
+            } catch (error) {
+              message = 'Error updating size quantity';
             }
           } else {
-            message = 'Color not found';
+            existingColor.sizes.push(godowns[0].colors[0].sizes[0]);
+            message = 'New size added';
           }
         } else {
-          message = 'Godown not found';
+
+          existingGodown.colors.push(godowns[0].colors[0]);
+          message = 'New color and quantities added';
         }
-      
+      } else {
+        item.godowns.push(godowns[0]);
+        message = 'New godown, color, and quantities added';
+      }
 
       try {
         await item.save();
-        const data = await stockModel.findByIdAndUpdate(updateid, item, { new: true });
-        res.json({ status: true, data: data, message: message });
+        const data = await stockModel.findByIdAndUpdate(id, item, { new: true });
+       next();
       } catch (error) {
+        console.log(error.message);
         res.json({ status: false, message: error });
       }
     } else {
-      res.json({ status: false, message: 'No stock item found' });
+      let counter = await counterModel.findOne({ id: "itemCode" });
+      let seqId;
+
+      if (!counter) {
+        const newCounter = new counterModel({ id: "itemCode", seq: 1 });
+        await newCounter.save();
+        seqId = "S" + newCounter.seq.toString().padStart(2, "0");
+      } else {
+        counter.seq += 1;
+        await counter.save();
+        seqId = "S" + counter.seq.toString().padStart(2, "0");
+      }
+
+      let addStock;
+      if (Array.isArray(godowns)) {
+
+        addStock = new stockModel({ categoryId: categoryId, itemId: itemId, itemCode: seqId, godowns: godowns });
+      } else {
+
+        addStock = new stockModel({ categoryId: categoryId, itemId: itemId, itemCode: seqId, godowns: godowns });
+      }
+
+      const successRes = await addStock.save();
+
+      next();
     }
   } catch (error) {
-    res.json({ status: false, message: 'Error Occurred' });
+   
+      console.log(error);
+      res.json({ status: false, message: 'Error Occurred' });
+    
   }
 }

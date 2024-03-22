@@ -255,7 +255,7 @@ export async function getOwner(req, res) {
         let companyId = req.params.companyId;
         let userModel = await getUserModel(companyId);
         let godownmode = await getGodownModel(companyId);
-        let data = await userModel.find({ userType: 'Owner' }).populate({ path: 'godownAccess', model: godownmode }).populate({ path: 'companyId', model: await getCompanyModel() });
+        let data = await userModel.findOne({ userType: 'Owner' }).populate({ path: 'godownAccess', model: godownmode }).populate({ path: 'companyId', model: await getCompanyModel() });
         res.status(200).json({ status: true, data: data, message: "Users Loaded" });
 
     } catch (error) {

@@ -44,23 +44,7 @@ const inventorySchema = new Schema({
     }},{timestamps:true}); 
 
 
-inventorySchema.pre('save', async function (next) {
 
-    this.updatedOn = new Date();
-    this.createdOn = new Date();
- 
-    next();
- 
- });
- 
- inventorySchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
-    this.updatedOn = new Date();
- 
-    next();
- });
  
  const getInventoryModel=async (companyId)=>{
     const companyDb=await getCompanyDb(companyId);

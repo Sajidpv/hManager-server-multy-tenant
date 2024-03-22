@@ -74,12 +74,18 @@ export async function getFinishCutter(req, res, next) {
 }
 
 
-
 export async function getFinishCutterAggregate(req, res, next) {
   try {
     let companyId = req.user.companyId;
     let cutterFinishModel = await getCutterFinishModel(companyId);
     const result = await cutterFinishModel.aggregate([
+      {
+        $match: {
+            "items.sizes.status": "",
+            "items.sizes.balanceQuantity": { $gt: 0 }
+        }
+    },
+    
       {
         $group: {
           _id: "$productId",
@@ -157,7 +163,6 @@ export async function getFinishCutterAggregate(req, res, next) {
         }
       }
     ]).exec();
-
     res.json({ message: 'Loaded', data: result, status: true });
   } catch (error) {
     res.json({ message: error, status: false });

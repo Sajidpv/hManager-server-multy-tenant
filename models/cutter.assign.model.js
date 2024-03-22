@@ -53,17 +53,7 @@ const cutterAssgnSchema = new Schema({
       }
    ]},{timestamps:true}); 
 
-cutterAssgnSchema.pre('save', function (next) {
-   this.updatedOn = this.createdOn = new Date();
-   next();
-});
 
-cutterAssgnSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
-   const update = this.getUpdate();
-   delete update._id;
-   this.updatedOn = new Date();
-   next();
-});
 
 const getCutterAssignModel=async (companyId)=>{
    const companyDb=await getCompanyDb(companyId);

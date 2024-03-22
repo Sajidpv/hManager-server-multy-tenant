@@ -43,23 +43,7 @@ const orderSchema = new Schema({
     },]},{timestamps:true}); 
 
 
-orderSchema.pre('save', async function (next) {
 
-    this.updatedOn = new Date();
-    this.createdOn = new Date();
- 
-    next();
- 
- });
- 
- orderSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
-    this.updatedOn = new Date();
- 
-    next();
- });
  
  const getOrderModel=async (companyId)=>{
     const companyDb=await getCompanyDb(companyId);

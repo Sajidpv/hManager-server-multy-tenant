@@ -24,19 +24,7 @@ const godownSchema = new Schema({
 },{timestamps:true});
 
 
-godownSchema.pre('save', async function (next) {
- 
-    next();
- 
- });
- 
- godownSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
- 
-    next();
- });
+
  
 
  const getGodownModel=async (companyId)=>{

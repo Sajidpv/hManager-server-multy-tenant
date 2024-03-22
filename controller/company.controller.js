@@ -61,6 +61,7 @@ export async function activateCompany(req, res, next) {
                 if (item) {
                     res.json({ status: true, message: 'Company Status updated' });
                 } else if (!item && req.body.status === 'Active') {
+                    const data = await companyModel.findByIdAndUpdate(companyId, { password: req.body.password }, options);
                     req.user.companyId = companyId;
                     req.body.status = 'Active'
                     next();

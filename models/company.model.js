@@ -54,7 +54,6 @@ const companySchema = new Schema({
     }, 
     password: {
         type: String,
-        required: true,
      },
     userType: {
         type: String,
@@ -90,7 +89,6 @@ companySchema.pre('save', async function (next) {
         var company = this;
         const salt = await (bcrypt.genSalt(10));
         const hashpass = await bcrypt.hash(company.password, salt);
-  
         company.password = hashpass;
         next();
      } catch (error) {
@@ -99,13 +97,6 @@ companySchema.pre('save', async function (next) {
  
  });
  
- companySchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
-
-    next();
- });
  companySchema.methods.comparePassword = async function (userPassword) {
     try {
        const isMatched = await bcrypt.compare(userPassword, this.password);
@@ -116,7 +107,6 @@ companySchema.pre('save', async function (next) {
  }
 
  
- const companyModel=model('company-details', companySchema);
  
 const getDb=async()=>{
     return db?db:await connect(process.env.BASE_DB_URL+process.env.DB_NAME)

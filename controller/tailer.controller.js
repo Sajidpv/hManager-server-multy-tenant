@@ -11,7 +11,7 @@ export async function assignTailer(req, res, next) {
         let tailerModel = await getTailerModel(companyId);
         const { date, batchId, productId, stockId, employId, color, size, assignedQuantity, cutterFinishId } = req.body;
 
-        const addToAssign = new tailerModel({ date: date, batchId: batchId, productId: productId, stockId: stockId, cutterFinishId: cutterFinishId, employId: employId, color: color, size: size, assignedQuantity: assignedQuantity, finishedQuantity: 0, balanceQuantity: assignedQuantity, damageQuantity: 0 });
+        const addToAssign = new tailerModel({ date: date, batchId: batchId, productId: productId, stockId: stockId, cutterFinishId: cutterFinishId, employId: employId, color: color, size: size, assignedQuantity: assignedQuantity, finishedQuantity: 0, balanceQuantity: assignedQuantity,toAssignQuantity:0, damageQuantity: 0 });
         await addToAssign.save();
         next();
     } catch (error) {
@@ -44,7 +44,8 @@ export async function updateTailerDatas(req, res, next) {
 
         const updateObj = {
             $set: {
-                balanceQuantity: balanceQuantity
+                balanceQuantity: balanceQuantity,
+                toAssignQuantity:finishedQuantity
             },
             $inc: {
                 finishedQuantity: finishedQuantity,
@@ -78,12 +79,30 @@ export async function updateTailerStatus(req, res, next) {
     try {
         let companyId = req.user.companyId;
         let tailerModel = await getTailerModel(companyId);
-        const {tailerFinishId} = req.body;
+        const {tailerFinishId,assignedQuantity} = req.body;
         const result = await tailerModel.updateOne(
             { _id: tailerFinishId },
-            { $set: { status: 'Assigned' } },
+            [
+                {
+                    $set: {
+                        toAssignQuantity: { $subtract: ["$toAssignQuantity", assignedQuantity] }
+                    }
+                },
+                {
+                    $set: {
+                        status: {
+                            $cond: {
+                                if: { $eq: ["$toAssignQuantity", 0] },
+                                then: "Assigned",
+                                else: "$status" 
+                            }
+                        }
+                    }
+                }
+            ],
             { new: true }
         );
+        
 
         if (result.nModified === 0) {
             return res.status(404).json({ status: false, message: "Item not found" });
@@ -107,7 +126,7 @@ export async function getFinishedTailer(req, res, next) {
             {
                 $match: {
                     status: 'To be assigned',
-                    finishedQuantity: { $gt: 0 }
+                    toAssignQuantity: { $gt: 0 }
                 }
             },
             {

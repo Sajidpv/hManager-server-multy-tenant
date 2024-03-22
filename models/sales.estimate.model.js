@@ -92,23 +92,7 @@ const salesEstimateSchema = new Schema({
         required: true,
     }},{timestamps:true}); 
 
-salesEstimateSchema.pre('save', async function (next) {
 
-    this.updatedOn = new Date();
-    this.createdOn = new Date();
- 
-    next();
- 
- });
- 
- salesEstimateSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function(next) {
- 
-    const update = this.getUpdate();
-    delete update._id;
-    this.updatedOn = new Date();
- 
-    next();
- });
  
  const getsalesEstimateModel=async (companyId)=>{
     const companyDb=await getCompanyDb(companyId);

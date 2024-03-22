@@ -79,4 +79,29 @@ export async function updateFinisherDatas(req, res, next) {
     }
 }
 
+export async function updateFinisherStatus(req, res, next) {
+    try {
+        let companyId = req.user.companyId;
+        let finisherModel = await getFinisherModel(companyId);
+        const itemId = req.params.id;
+        const result = await finisherModel.updateOne(
+            { _id: itemId },
+           { $set: {
+                status: 'Finished'
+            },},
+            { new: true }
+        );
+
+        if (result.nModified === 0) {
+            return res.status(404).json({ status: false, message: "Item not found" });
+        }
+            const updatedItem = await finisherModel.findById(itemId);
+            res.json({ status: true, data: updatedItem, message: "Finished successfull" });
+        
+    } catch (error) {
+        res.status(500).json({ status: false, message: error.message });
+    }
+}
+
+
 

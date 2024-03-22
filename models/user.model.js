@@ -101,26 +101,17 @@ const userSchema = new Schema({
 
 
 userSchema.pre('save', async function (next) {
-   this.updatedOn = new Date();
-   this.createdOn = new Date();
    try {
       var user = this;
       const salt = await (bcrypt.genSalt(10));
       const hashpass = await bcrypt.hash(user.password, salt);
-
       user.password = hashpass;
       next();
    } catch (error) {
       throw error;
    }
 });
-userSchema.pre(['update', 'findOneAndUpdate', 'updateOne'], function (next) {
-   const update = this.getUpdate();
-   delete update._id;
-   this.updatedOn = new Date();
 
-   next();
-});
 
 
 
@@ -175,7 +166,7 @@ async function getDefaultGodownAccessPermissions(userType, companyId) {
 
 function getDefaultPermissions(userType) {
    const commonPermissions = { READ: true, WRITE: true, EDIT: true, DELETE: true };
-   const customResources = ['user', 'suppliers', 'colors', 'stock', 'sales', 'material-purchase', 'orders', 'stock-categories', 'sizes',
+   const customResources = ['user', 'suppliers', 'colors', 'stock', 'sales', 'purchases', 'orders', 'stock-categories', 'sizes',
       'inventory-db', 'godowns', 'tailer-docs', 'sales-estimates', 'finisher-docs', 'finish-cutter', 'assign-cutter', 'company-details'];
    switch (userType) {
       case 'Owner':
@@ -207,7 +198,7 @@ function getDefaultPermissions(userType) {
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             { resource: 'company-details', permissions: { READ: true, } },
-            ...getDefaultCommonPermissions(commonPermissions, ['orders', 'material-purchase', 'suppliers'])
+            ...getDefaultCommonPermissions(commonPermissions, ['orders', 'purchases', 'suppliers'])
          ];
       case 'Sales Admin':
          return [
@@ -238,7 +229,7 @@ function getDefaultPermissions(userType) {
             { resource: 'sizes', permissions: { READ: true, } },
             { resource: 'stock-categories', permissions: { READ: true, } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
-            { resource: 'finish-cutter', permissions: { READ: true, WRITE: true, } },
+            { resource: 'finish-cutter', permissions: { READ: true, WRITE: true,EDIT:true } },
             { resource: 'assign-cutter', permissions: { READ: true, EDIT: true, } },
             { resource: 'company-details', permissions: { READ: true, } },
          ]; case 'Tailer':
@@ -246,12 +237,12 @@ function getDefaultPermissions(userType) {
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
             { resource: 'tailer-docs', permissions: { READ: true, WRITE: true,EDIT: true, } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
-            { resource: 'finish-cutter', permissions: { READ: true, } },
+            { resource: 'finish-cutter', permissions: { READ: true,EDIT:true } },
             { resource: 'company-details', permissions: { READ: true, } },
          ]; case 'Finisher':
          return [
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
-            { resource: 'tailer-docs', permissions: { READ: true, } },
+            { resource: 'tailer-docs', permissions: { READ: true,EDIT:true } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } },
