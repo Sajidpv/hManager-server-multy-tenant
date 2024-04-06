@@ -55,6 +55,10 @@ const finisherSchema = new Schema({
         type: Number,
         require: true
     },
+    toStockQuantity: {
+        type: Number,
+        require: true
+    },
  
     status: {
         type: String,

@@ -51,11 +51,6 @@ export async function update(req, res) {
         if (!existingColor) {
             return res.json({ status: false, message: "Color not found" });
         } else {
-            const item = await checkcolor(formattedColor);
-
-            if (item) {
-                return res.json({ status: false, message: "Color already exists" });
-            }
 
             res.json({ status: true, data: existingColor, message: "Color updated successfully" });
         }

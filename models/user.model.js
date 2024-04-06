@@ -178,10 +178,12 @@ function getDefaultPermissions(userType) {
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
             { resource: 'stock', permissions: { READ: true, EDIT: true, } },
             { resource: 'stock-categories', permissions: { READ: true, } },
+            { resource: 'stock-category-items', permissions: { READ: true, } },
             { resource: 'colors', permissions: { READ: true, WRITE: true } },
             { resource: 'sizes', permissions: { READ: true, WRITE: true, EDIT: true, } },
             { resource: 'orders', permissions: { READ: true, WRITE: true, EDIT: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
+            { resource: 'company-details', permissions: { READ: true, } },
             ...getDefaultCommonPermissions(commonPermissions, [
                'tailer-docs', 'finisher-docs',
                'finish-cutter', 'assign-cutter'
@@ -193,6 +195,7 @@ function getDefaultPermissions(userType) {
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
             { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } },
             { resource: 'stock-categories', permissions: { READ: true, WRITE: true, EDIT: true, } },
+             { resource: 'stock-category-items', permissions: { READ: true, } },
             { resource: 'sizes', permissions: { READ: true, WRITE: true, } },
             { resource: 'colors', permissions: { READ: true, WRITE: true } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
@@ -200,10 +203,25 @@ function getDefaultPermissions(userType) {
             { resource: 'company-details', permissions: { READ: true, } },
             ...getDefaultCommonPermissions(commonPermissions, ['orders', 'purchases', 'suppliers'])
          ];
+         case 'Store Keeper':
+            return [
+               { resource: 'user', permissions: { READ: true, EDIT: true, } },
+               { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true,DELETE:true } }, 
+               { resource: 'stock-category-items', permissions: { READ: true, WRITE: true, EDIT: true } },
+               { resource: 'stock-categories', permissions: { READ: true, WRITE: true, EDIT: true } },
+               { resource: 'colors', permissions: { READ: true , WRITE: true, EDIT: true} },
+               { resource: 'sizes', permissions: { READ: true, WRITE: true, EDIT: true } },
+               { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
+               { resource: 'godowns', permissions: { READ: true, } },
+               { resource: 'orders', permissions: { READ: true,WRITE:true,EDIT:false } },
+               { resource: 'company-details', permissions: { READ: true, } },
+               ...getDefaultCommonPermissions(commonPermissions, [ 'suppliers'])
+            ];         
       case 'Sales Admin':
          return [
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
-            { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } },
+            { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } }, 
+            { resource: 'stock-category-items', permissions: { READ: true, } },
             { resource: 'stock-categories', permissions: { READ: true, } },
             { resource: 'colors', permissions: { READ: true } },
             { resource: 'sizes', permissions: { READ: true, } },
@@ -217,6 +235,7 @@ function getDefaultPermissions(userType) {
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
             { resource: 'sales', permissions: { READ: true, } },
             { resource: 'material-purchase', permissions: { READ: true, } },
+             { resource: 'stock-category-items', permissions: { READ: true, } },
             { resource: 'colors', permissions: { READ: true } },
             { resource: 'inventory-db', permissions: { READ: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
@@ -229,24 +248,24 @@ function getDefaultPermissions(userType) {
             { resource: 'sizes', permissions: { READ: true, } },
             { resource: 'stock-categories', permissions: { READ: true, } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
-            { resource: 'finish-cutter', permissions: { READ: true, WRITE: true,EDIT:true } },
+            { resource: 'finish-cutter', permissions: { READ: true, WRITE: true, EDIT: true } },
             { resource: 'assign-cutter', permissions: { READ: true, EDIT: true, } },
             { resource: 'company-details', permissions: { READ: true, } },
          ]; case 'Tailer':
          return [
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
-            { resource: 'tailer-docs', permissions: { READ: true, WRITE: true,EDIT: true, } },
+            { resource: 'tailer-docs', permissions: { READ: true, WRITE: true, EDIT: true, } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
-            { resource: 'finish-cutter', permissions: { READ: true,EDIT:true } },
+            { resource: 'finish-cutter', permissions: { READ: true, EDIT: true } },
             { resource: 'company-details', permissions: { READ: true, } },
          ]; case 'Finisher':
          return [
             { resource: 'user', permissions: { READ: true, EDIT: true, } },
-            { resource: 'tailer-docs', permissions: { READ: true,EDIT:true } },
+            { resource: 'tailer-docs', permissions: { READ: true, EDIT: true } },
             { resource: 'inventory-db', permissions: { READ: true, WRITE: true, } },
             { resource: 'godowns', permissions: { READ: true, } },
             { resource: 'stock', permissions: { READ: true, WRITE: true, EDIT: true, } },
-            { resource: 'finisher-docs', permissions: { READ: true, EDIT: true,WRITE: true, } },
+            { resource: 'finisher-docs', permissions: { READ: true, EDIT: true, WRITE: true, } },
             { resource: 'company-details', permissions: { READ: true, } },
          ];
       default:

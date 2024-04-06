@@ -25,7 +25,8 @@ const purchaseSchema = new Schema({
     },
     orderNo:
     {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref:getOrderModel,
         default:''
 
     },

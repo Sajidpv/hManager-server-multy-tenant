@@ -11,7 +11,7 @@ export async function assignFinisher(req, res, next) {
         let finisherAssignModel = await getFinisherModel(companyId);
         const { date, batchId, productId, stockId, employId, color, size, assignedQuantity, tailerFinishId } = req.body;
 
-        const addToAssign = new finisherAssignModel({ date: date, batchId: batchId, productId: productId, stockId: stockId, employId: employId, color: color, size: size, assignedQuantity: assignedQuantity, damageQuantity: 0, finishedQuantity: 0, balanceQuantity: assignedQuantity, tailerFinishId: tailerFinishId });
+        const addToAssign = new finisherAssignModel({ date: date, batchId: batchId, productId: productId, stockId: stockId, employId: employId, color: color, size: size, assignedQuantity: assignedQuantity, damageQuantity: 0, finishedQuantity: 0, balanceQuantity: assignedQuantity,toStockQuantity:0, tailerFinishId: tailerFinishId });
         await addToAssign.save();
         next();
     } catch (error) {
@@ -52,6 +52,7 @@ export async function updateFinisherDatas(req, res, next) {
             },
             $inc: {
                 finishedQuantity: finishedQuantity,
+                toStockQuantity:finishedQuantity,
                 damageQuantity: damageQuantity
             }
         };
@@ -84,11 +85,28 @@ export async function updateFinisherStatus(req, res, next) {
         let companyId = req.user.companyId;
         let finisherModel = await getFinisherModel(companyId);
         const itemId = req.params.id;
+        const { godowns } = req.body;
+
         const result = await finisherModel.updateOne(
             { _id: itemId },
-           { $set: {
-                status: 'Finished'
-            },},
+            [
+                {
+                    $set: {
+                        toStockQuantity: { $subtract: ["$toStockQuantity", godowns[0].colors[0].sizes[0].quantity] }
+                    }
+                },
+                {
+                    $set: {
+                        status: {
+                            $cond: {
+                                if: { $eq: ["$balanceQuantity", 0] },
+                                then: "Finished",
+                                else: "$status" 
+                            }
+                        }
+                    }
+                }
+            ],
             { new: true }
         );
 

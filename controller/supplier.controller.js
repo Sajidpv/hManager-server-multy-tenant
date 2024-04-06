@@ -4,16 +4,19 @@ export async function registerSupplier(req, res, next) {
     try {
         let companyId = req.user.companyId;
         let supplierModel = await getSupplierModel(companyId);
-        const { name,gstNo, address, status,accDetails,type } = req.body;
+        const { name, gstNo, address, status, accDetails, type } = req.body;
+        let item;
+        if (gstNo !== '') {
+            item = await supplierModel.findOne({ gstNo: gstNo });
 
-        const item =await supplierModel.findOne({gstNo:gstNo});
-        if(item){
+        }
+        if (item) {
             res.json({ status: false, message: "Supplier already registered" });
-        }else{
-            const createSupplier=new supplierModel({name,gstNo,address,status,accDetails,type});
+        } else {
+            const createSupplier = new supplierModel({ name, gstNo, address, status, accDetails, type });
             await createSupplier.save();
-            res.json({ status: true,data:createSupplier, message: "Supplier Registered Succefully" });
-        }        
+            res.json({ status: true, data: createSupplier, message: "Supplier Registered Succefully" });
+        }
 
     } catch (error) {
         if (error.code === 11000) {
@@ -76,11 +79,11 @@ export async function getSupplier(req, res) {
         let supplierModel = await getSupplierModel(companyId);
         var data;
         if (req.params.id) {
-             data = await supplierModel.findById(req.params.id);
+            data = await supplierModel.findById(req.params.id);
         } else {
-             data = await supplierModel.find();
+            data = await supplierModel.find();
         }
-        res.json({ message: 'Suppliers Loaded',data:data, status: true });
+        res.json({ message: 'Suppliers Loaded', data: data, status: true });
     } catch (error) {
         res.json({ message: error, status: false });
     }
@@ -91,10 +94,10 @@ export async function deleteSupplier(req, res) {
         let companyId = req.user.companyId;
         let supplierModel = await getSupplierModel(companyId);
         let data;
-             data = await supplierModel.findByIdAndDelete(req.params.id);
-         res.json({message:'Deleted Succesfully',status:true,data:data});
+        data = await supplierModel.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Deleted Succesfully', status: true, data: data });
     } catch (error) {
-        res.json({ status: false, message:error });
+        res.json({ status: false, message: error });
     }
 }
 
@@ -102,23 +105,23 @@ export async function deleteSupplier(req, res) {
 export async function updateStatus(req, res) {
     let companyId = req.user.companyId;
     let supplierModel = await getSupplierModel(companyId);
-    let id =req.params.id;
+    let id = req.params.id;
     let options = { new: true };
     const item = await supplierModel.findById(id);
-if(item){
-    
-  try {
-        const data = await supplierModel.findByIdAndUpdate(id,{ status:req.body.status}, options);
-        res.json({ status: true,data:item.save(), message: 'Update status'});
-    } catch (error) {
-        res.json({ message: error, status: false });
+    if (item) {
 
+        try {
+            const data = await supplierModel.findByIdAndUpdate(id, { status: req.body.status }, options);
+            res.json({ status: true, data: item.save(), message: 'Update status' });
+        } catch (error) {
+            res.json({ message: error, status: false });
+
+        }
+
+    } else {
+        res.json({ status: false, message: " No Supplier found" });
     }
 
-}else{
-    res.json({ status: false,message: " No Supplier found" });
-}
-  
 }
 
 
@@ -126,7 +129,7 @@ if(item){
 
 
 
-    
+
 
 
 
