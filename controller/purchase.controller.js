@@ -4,7 +4,6 @@ import getGodownModel from "../models/godown.model.js";
 import getStockCategoryModel from "../models/stock_categories.model.js";
 import getSupplierModel from "../models/supplier.model.js";
 import getStockItemsModel from "../models/stock_items.model.js";
-import getOrderModel from "../models/order_model.js";
 export async function registerPurchase(req, res, next) {
     try {
         let companyId = req.user.companyId;
@@ -41,7 +40,6 @@ export async function getPurchase(req, res) {
         let purchaseModel = await getPurchaseModel(companyId);
         let result = await purchaseModel.find()
         .populate({ path: 'supplier', model: await getSupplierModel(companyId) })
-        .populate({ path: 'orderNo', model: await getOrderModel(companyId) })
         .populate({ path: 'godownId', model: await getGodownModel(companyId) })
         .populate({ path: 'items.categoryId', model: await getStockCategoryModel(companyId) })
         .populate({ path: 'items.itemId', model: await getStockItemsModel(companyId) });

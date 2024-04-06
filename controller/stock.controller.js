@@ -23,7 +23,7 @@ export async function registerStock(req, res, next) {
       let message;
       if (existingGodown) {
         let existingColor = existingGodown.colors.find((color) => color.color === godowns[0].colors[0].color);
-        console.log('this is', existingColor)
+  
         if (existingColor) {
           const existingSize = existingColor.sizes.find((size) => size.size === godowns[0].colors[0].sizes[0].size);
 
