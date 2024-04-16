@@ -45,10 +45,11 @@ export async function updateTailerDatas(req, res, next) {
         const updateObj = {
             $set: {
                 balanceQuantity: balanceQuantity,
-                toAssignQuantity:finishedQuantity
+              
             },
             $inc: {
                 finishedQuantity: finishedQuantity,
+                toAssignQuantity:finishedQuantity,
                 damageQuantity: damageQuantity
             }
         };
@@ -92,7 +93,7 @@ export async function updateTailerStatus(req, res, next) {
                     $set: {
                         status: {
                             $cond: {
-                                if: { $eq: ["$toAssignQuantity", 0] },
+                                if: { $lte: ["$toAssignQuantity", 0] },
                                 then: "Assigned",
                                 else: "$status" 
                             }
@@ -125,7 +126,6 @@ export async function getFinishedTailer(req, res, next) {
         const result = await tailerModel.aggregate([
             {
                 $match: {
-                    status: 'To be assigned',
                     toAssignQuantity: { $gt: 0 }
                 }
             },
@@ -163,17 +163,17 @@ export async function getFinishedTailer(req, res, next) {
             {
                 $unwind: '$employ'
             },
-            {
-                $lookup: {
-                    from: 'finish-cutters',
-                    localField: 'cutterFinishId',
-                    foreignField: '_id',
-                    as: 'cutterFinish'
-                }
-            },
-            {
-                $unwind: '$cutterFinish'
-            },
+            // {
+            //     $lookup: {
+            //         from: 'finish-cutters',
+            //         localField: 'cutterFinishId',
+            //         foreignField: '_id',
+            //         as: 'cutterFinish'
+            //     }
+            // },
+            // {
+            //     $unwind: '$cutterFinish'
+            // },
             {
                 $group: {
                     _id: {
@@ -186,10 +186,11 @@ export async function getFinishedTailer(req, res, next) {
                         $push: {id:'$_id',
                             stockId: '$stock',
                             employId: '$employ',
-                            cutterFinishId: '$cutterFinish',
+                           // cutterFinishId: '$cutterFinish',
                             assignedQuantity: '$assignedQuantity',
                             damageQuantity: '$damageQuantity',
                             finishedQuantity: '$finishedQuantity',
+                            toAssignQuantity:'$toAssignQuantity',
                             status: '$status'
                         }
                     }

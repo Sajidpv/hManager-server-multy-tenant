@@ -83,7 +83,7 @@ router.post('/add_stock',checkPermission({ resource: 'stock', permission: 'WRITE
 router.get('/get_stock/:id',checkPermission({ resource: 'stock', permission: 'READ' }), getStock);
 router.get('/get_stock',checkPermission({ resource: 'stock', permission: 'READ' }), getStock);
 router.put('/update_stock_quantity',checkPermission({ resource: 'stock', permission: 'EDIT' }), updateStockQuantity);
-router.post('/add_final_product_to_stock_quantity/:id',checkPermission({ resource: 'stock', permission: 'WRITE' }), addFinalProductToStockQuantity,updateFinisherStatus);
+router.post('/add_final_product_to_stock_quantity/:id',checkPermission({ resource: 'stock', permission: 'EDIT' }), addFinalProductToStockQuantity,updateFinisherStatus);
 
 router.post('/add_cutter_assign',checkPermission({ resource: 'assign-cutter', permission: 'WRITE' }), registerCutterAssign,updateStockQuantity);
 router.get('/get_cutter_assign',checkPermission({ resource: 'assign-cutter', permission: 'READ' }),getAssignCutter);
