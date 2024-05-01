@@ -2,6 +2,7 @@ import  {Schema } from "mongoose";
 import {getCompanyDb} from "../config/db.js"
 import getStockCategoryModel from "./stock_categories.model.js";
 import getStockItemsModel from "./stock_items.model.js";
+import getSupplierModel from "./supplier.model.js";
 
 const orderSchema = new Schema({
 
@@ -20,6 +21,11 @@ const orderSchema = new Schema({
      itemId: {
         type: Schema.Types.ObjectId,
         ref:getStockItemsModel,
+        required: true,
+     },
+     customerId: {
+        type: Schema.Types.ObjectId,
+        ref:getSupplierModel,
         required: true,
      },
     orderType: {

@@ -6,7 +6,7 @@ export async function registerStockCategory(req, res, next) {
     let companyId = req.user.companyId;
     let stockCategoryModel = await getStockCategoryModel(companyId);
     let counterModel = await getCounterModel(companyId);
-    const { categoryName, discription, isColorApplicable, isSizeApplicable, isProductionItem, isProduct } = req.body;
+    const { categoryName, discription, isColorApplicable, isSizeApplicable, isProductionItem,isProductionAddon, isProduct } = req.body;
     const formattedCategoryName = categoryName.charAt(0).toUpperCase() +
       categoryName.slice(1).toLowerCase();
     const item = await stockCategoryModel.findOne({categoryName: formattedCategoryName });
@@ -28,7 +28,7 @@ export async function registerStockCategory(req, res, next) {
         seqId = "C" + counter.seq.toString().padStart(2, "0");
       }
 
-      const addcategory = new stockCategoryModel({ categoryName: formattedCategoryName, discription: discription, categoryNumber: seqId, isColorApplicable: isColorApplicable, isSizeApplicable: isSizeApplicable, isProductionItem: isProductionItem, isProduct: isProduct });
+      const addcategory = new stockCategoryModel({ categoryName: formattedCategoryName, discription: discription, categoryNumber: seqId, isColorApplicable: isColorApplicable, isSizeApplicable: isSizeApplicable, isProductionItem: isProductionItem,isProductionAddon:isProductionAddon, isProduct: isProduct });
       await addcategory.save();
       res.json({ status: true, data: addcategory, message: "Category added Succefully" });
     }
@@ -74,7 +74,8 @@ export async function updateStockCategory(req, res) {
       isColorApplicable,
       isSizeApplicable,
       isProductionItem,
-      isProduct
+      isProduct,
+      isProductionAddon
     } = eModel;
 
     const formattedCategoryName = categoryName.charAt(0).toUpperCase() +
@@ -89,7 +90,8 @@ export async function updateStockCategory(req, res) {
           isColorApplicable,
           isSizeApplicable,
           isProductionItem,
-          isProduct
+          isProduct,
+          isProductionAddon
         }
       },
       { new: true }

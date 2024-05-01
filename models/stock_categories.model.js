@@ -25,6 +25,10 @@ const categorySchema = new Schema({
       type: Boolean,
       require: true,
    },
+   isProductionAddon: {
+      type: Boolean,
+      require: true,
+   },
    isProduct: {
       type: Boolean,
       require: true,

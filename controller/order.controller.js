@@ -2,13 +2,15 @@ import getOrderModel from "../models/order_model.js";
 import getCounterModel from "../models/counter.model.js";
 import getStockCategoryModel from "../models/stock_categories.model.js";
 import getStockItemsModel from "../models/stock_items.model.js";
+import getSupplierModel from "../models/supplier.model.js";
 
 export async function registerOrder(req, res, next) {
     try {
         let companyId = req.user.companyId;
         let orderModel = await getOrderModel(companyId);
         let counterModel = await getCounterModel(companyId);
-        const { date,orderType, categoryId,itemId,items} = req.body;
+        const { date,orderType, categoryId,itemId,customerId,items} = req.body;
+        console.log(itemId)
         let counter = await counterModel.findOne({ id: "orderNo" });
 
         let seqId;
@@ -21,7 +23,7 @@ export async function registerOrder(req, res, next) {
           await counter.save();
           seqId = counter.seq.toString().padStart(2, "0");
         }
-        const createOrder = new orderModel({ date: date, orderType: orderType, orderNo: seqId, categoryId: categoryId, itemId: itemId, items: items });
+        const createOrder = new orderModel({ date: date, orderType: orderType, orderNo: seqId, categoryId: categoryId, itemId: itemId,customerId:customerId, items: items });
          await createOrder.save();
 
             res.json({ status: true,data:createOrder, message: "Order Placed Succefully" });
@@ -37,7 +39,10 @@ export async function getOrder(req, res) {
     try {
         let companyId = req.user.companyId;
         let orderModel = await getOrderModel(companyId);
-        let result = await orderModel.find().populate({path:'categoryId',model: await getStockCategoryModel(companyId)}).populate({path:'itemId',model: await getStockItemsModel(companyId)});   
+        let result = await orderModel.find()
+        .populate({path:'categoryId',model: await getStockCategoryModel(companyId)})
+        .populate({path:'itemId',model: await getStockItemsModel(companyId)})
+        .populate({path:'customerId',model: await getSupplierModel(companyId)});   
         res.json({ status: true,data:result, message: "Order Loaded Succefully" });
     } catch (error) {
         res.json({status:false,message:error.message});
